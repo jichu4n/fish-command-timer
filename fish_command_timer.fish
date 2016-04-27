@@ -128,7 +128,7 @@ function -e fish_preexec fish_command_timer_preexec
   if not set -q fish_command_timer_enabled
     return
   end
-  set fish_command_timer_start_time (fish_command_timer_get_time)
+  set fish_command_timer_start_time (fish_command_timer_get_ts)
 end
 
 # The fish_postexec event is fired after executing a command line.
@@ -144,7 +144,7 @@ function -e fish_postexec fish_command_timer_postexec
   set -l DAY (math "24 * $HOUR")
 
   set -l command_start_time $fish_command_timer_start_time
-  set -l command_end_time (fish_command_timer_get_time)
+  set -l command_end_time (fish_command_timer_get_ts)
   set -l command_time (math "$command_end_time - $command_start_time")
   set -l num_days (math "$command_time / $DAY")
   set -l num_hours (math "$command_time % $DAY / $HOUR")
