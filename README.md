@@ -52,7 +52,7 @@ you want the changes to only affect your current shell session.
   this script.
 * `set fish_command_timer_color blue`: The color of the output. This should be a
   color string recognized by fish's set_color command, as described
-  (http://fishshell.com/docs/current/commands.html#set_color)[here]. If not set,
+  [here](http://fishshell.com/docs/current/commands.html#set_color). If not set,
   the output will be in the default color.
 * `set fish_command_timer_time_format '%b %d %I:%M%p'`: The display format of
   the current time.  This is a strftime format string (see
