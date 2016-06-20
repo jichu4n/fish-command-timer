@@ -69,6 +69,15 @@ if not set -q fish_command_timer_millis
   set fish_command_timer_millis 1
 end
 
+# Whether to export the duration string as a shell variable.
+#
+# When set, this will export the duration string as an environment variable
+# called $CMD_DURATION_STR.
+if not set -q fish_command_timer_export_cmd_duration_str
+  set fish_command_timer_export_cmd_duration_str 1
+  set CMD_DURATION_STR
+end
+
 
 # IMPLEMENTATION
 # ==============
@@ -190,6 +199,12 @@ function -e fish_postexec fish_command_timer_postexec
     set num_msecs_pretty (printf '%03d' $num_msecs)
   end
   set time_str {$time_str}{$num_secs}s{$num_msecs_pretty}
+  if begin
+      set -q fish_command_timer_export_cmd_duration_str; and \
+      [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
+     end
+    set CMD_DURATION_STR "$time_str"
+  end
 
   set -l now_str (fish_command_timer_print_time (math "$command_end_time / $SEC"))
   set -l output_str
