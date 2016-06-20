@@ -44,9 +44,9 @@ Settings
 --------
 
 You can use the following options to tweak the behavior of the script. You can
-either make the changes in-place (at the top of the script) or put them after
-sourcing the script in your `config.fish`. You can also modify them on-the-fly if
-you want the changes to only affect your current shell session.
+either make the changes in-place (at the top of the script) or put them before
+or after sourcing the script in your `config.fish`. You can also modify them
+on-the-fly if you want the changes to only affect your current shell session.
 
 * `set fish_command_timer_enabled`: Unsetting this variable with `set -e` disables
   this script.
