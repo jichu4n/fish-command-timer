@@ -89,7 +89,7 @@ else if type gdate > /dev/null ^ /dev/null; and gdate +'%N' | grep -qv 'N'
   function fish_command_timer_print_time
     gdate --date="@$argv[1]" +"$fish_command_timer_time_format"
   end
-else if type perl > /dev/null ^ /dev/null; and
+else if type perl > /dev/null ^ /dev/null
   function fish_command_timer_get_ts
     perl -MTime::HiRes -e 'printf("%d",Time::HiRes::time()*1000000000)'
   end
