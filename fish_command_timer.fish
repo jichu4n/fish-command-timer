@@ -31,10 +31,12 @@
 #
 # To temporarily disable the printing of timing information, type the following
 # in a session:
-#     set -e fish_command_timer_enabled
+#     set fish_command_timer_enabled 0
 # To re-enable:
-#     set fish_command_timer_enabled
-set fish_command_timer_enabled
+#     set fish_command_timer_enabled 1
+if not set -q fish_command_timer_enabled
+  set fish_command_timer_enabled 1
+end
 
 # The color of the output.
 #
@@ -45,7 +47,9 @@ set fish_command_timer_enabled
 #
 # If empty, disable colored output. Set it to empty if your terminal does not
 # support colors.
-set fish_command_timer_color blue
+if not set -q fish_command_timer_color
+  set fish_command_timer_color blue
+end
 
 # The display format of the current time.
 #
@@ -54,12 +58,16 @@ set fish_command_timer_color blue
 # pattern.
 #
 # If empty, disables printing of current time.
-set fish_command_timer_time_format '%b %d %I:%M%p'
+if not set -q fish_command_timer_time_format
+  set fish_command_timer_time_format '%b %d %I:%M%p'
+end
 
 # Whether to print command timings up to millisecond precision.
 #
-# If unset, will print up to seconds precision.
-set fish_command_timer_millis
+# If set to 0, will print up to seconds precision.
+if not set -q fish_command_timer_millis
+  set fish_command_timer_millis 1
+end
 
 
 # IMPLEMENTATION
@@ -98,7 +106,7 @@ else if type perl > /dev/null ^ /dev/null
   end
 else
   echo 'No compatible date, gdate or perl commands found, not enabling fish command timer'
-  set -e fish_command_timer_enabled
+  set fish_command_timer_enabled 0
 end
 
 # fish_command_timer_strlen:
@@ -120,7 +128,7 @@ else if type wc > /dev/null ^ /dev/null; and type tr > /dev/null ^ /dev/null
   end
 else
   echo 'No compatible string, expr, or wc commands found, not enabling fish command timer'
-  set -e fish_command_timer_enabled
+  set fish_command_timer_enabled 0
 end
 
 if not set -q fish_command_timer_start_time
@@ -129,7 +137,10 @@ end
 
 # The fish_preexec event is fired before executing a command line.
 function -e fish_preexec fish_command_timer_preexec
-  if not set -q fish_command_timer_enabled
+  if begin
+       not set -q fish_command_timer_enabled; or \
+       not [ "$fish_command_timer_enabled" -ne 0 ]
+     end
     return
   end
   set fish_command_timer_start_time (fish_command_timer_get_ts)
@@ -137,7 +148,10 @@ end
 
 # The fish_postexec event is fired after executing a command line.
 function -e fish_postexec fish_command_timer_postexec
-  if not set -q fish_command_timer_enabled
+  if begin
+       not set -q fish_command_timer_enabled; or \
+       not [ "$fish_command_timer_enabled" -ne 0 ]
+     end
     return
   end
   if [ -z "$fish_command_timer_start_time" ]
@@ -169,7 +183,10 @@ function -e fish_postexec fish_command_timer_postexec
     set time_str {$time_str}{$num_mins}"m "
   end
   set -l num_msecs_pretty ''
-  if set -q fish_command_timer_millis
+  if begin
+      set -q fish_command_timer_millis; and \
+      [ "$fish_command_timer_millis" -ne 0 ]
+     end
     set num_msecs_pretty (printf '%03d' $num_msecs)
   end
   set time_str {$time_str}{$num_secs}s{$num_msecs_pretty}
@@ -182,7 +199,10 @@ function -e fish_postexec fish_command_timer_postexec
     set output_str "[ $time_str ]"
   end
   set -l output_str_colored
-  if set -q fish_command_timer_color
+  if begin
+       set -q fish_command_timer_color; and \
+       [ -n "$fish_command_timer_color" ]
+     end
     set output_str_colored (set_color $fish_command_timer_color)"$output_str"(set_color normal)
   else
     set output_str_colored "$output_str"
