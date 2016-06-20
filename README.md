@@ -48,8 +48,8 @@ either make the changes in-place (at the top of the script) or put them before
 or after sourcing the script in your `config.fish`. You can also modify them
 on-the-fly if you want the changes to only affect your current shell session.
 
-* `set fish_command_timer_enabled`: Unsetting this variable with `set -e` disables
-  this script.
+* `set fish_command_timer_enabled`: Setting this variable to `0` disables this
+  script.
 * `set fish_command_timer_color blue`: The color of the output. This should be a
   color string recognized by fish's set_color command, as described
   [here](http://fishshell.com/docs/current/commands.html#set_color). If not set,
@@ -58,5 +58,5 @@ on-the-fly if you want the changes to only affect your current shell session.
   the current time.  This is a strftime format string (see
   http://strftime.org/). If empty, the current time will not be printed.
 * `set fish_command_timer_millis`: Whether to print timings to millisecond
-  precision. If unset, will print timings up to seconds.
+  precision. If set to `0`, will print timings up to seconds.
 
