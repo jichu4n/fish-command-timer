@@ -140,6 +140,9 @@ function -e fish_postexec fish_command_timer_postexec
   if not set -q fish_command_timer_enabled
     return
   end
+  if [ -z "$fish_command_timer_start_time" ]
+    return
+  end
 
   set -l MSEC 1000000
   set -l SEC (math "1000 * $MSEC")
