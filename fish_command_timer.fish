@@ -89,37 +89,25 @@ end
 
 # fish_command_timer_get_ts:
 #
-# Command to print out the current time in nanoseconds. This is required
-# because the "date" command in OS X and BSD do not support the %N sequence.
+# Command to print out the current time in seconds.
 #
 # fish_command_timer_print_time:
 #
 # Command to print out a timestamp using fish_command_timer_time_format. The
 # timestamp should be in seconds. This is required because the "date" command in
 # Linux and OS X use different arguments to specify the timestamp to print.
-if date +'%N' | grep -qv 'N'
-  function fish_command_timer_get_ts
-    date '+%s%N'
-  end
+if date --date='@0' '+%s' > /dev/null ^ /dev/null
+  # Linux.
   function fish_command_timer_print_time
     date --date="@$argv[1]" +"$fish_command_timer_time_format"
   end
-else if type gdate > /dev/null ^ /dev/null; and gdate +'%N' | grep -qv 'N'
-  function fish_command_timer_get_ts
-    gdate '+%s%N'
-  end
-  function fish_command_timer_print_time
-    gdate --date="@$argv[1]" +"$fish_command_timer_time_format"
-  end
-else if type perl > /dev/null ^ /dev/null
-  function fish_command_timer_get_ts
-    perl -MTime::HiRes -e 'printf("%d",Time::HiRes::time()*1000000000)'
-  end
+else if date -r 0 '+%s' > /dev/null ^ /dev/null
+  # macOS / BSD.
   function fish_command_timer_print_time
     date -r "$argv[1]" +"$fish_command_timer_time_format"
   end
 else
-  echo 'No compatible date, gdate or perl commands found, not enabling fish command timer'
+  echo 'No compatible date commands found, not enabling fish command timer'
   set fish_command_timer_enabled 0
 end
 
@@ -145,8 +133,7 @@ else
   set fish_command_timer_enabled 0
 end
 
-# Computes whether the preexec and postexec hooks should compute command
-# duration.
+# Computes whether the postexec hooks should compute command duration.
 function fish_command_timer_compute
   begin
     set -q fish_command_timer_enabled; and \
@@ -158,41 +145,23 @@ function fish_command_timer_compute
   end
 end
 
-if not set -q fish_command_timer_start_time
-  set fish_command_timer_start_time
-end
-
-# The fish_preexec event is fired before executing a command line.
-function -e fish_preexec fish_command_timer_preexec
+# The fish_postexec event is fired after executing a command line.
+function -e fish_postexec fish_command_timer_postexec
   if not fish_command_timer_compute
     return
   end
-  set fish_command_timer_start_time (fish_command_timer_get_ts)
-end
+  set -l command_end_time (date '+%s')
 
-# The fish_postexec event is fired after executing a command line.
-function -e fish_postexec fish_command_timer_postexec
-  if begin
-       [ -z "$fish_command_timer_start_time" ]; or \
-       not fish_command_timer_compute
-     end
-    return
-  end
+  set -l SEC 1000
+  set -l MIN 60000
+  set -l HOUR 3600000
+  set -l DAY 86400000
 
-  set -l MSEC 1000000
-  set -l SEC (math "1000 * $MSEC")
-  set -l MIN (math "60 * $SEC")
-  set -l HOUR (math "60 * $MIN")
-  set -l DAY (math "24 * $HOUR")
-
-  set -l command_start_time $fish_command_timer_start_time
-  set -l command_end_time (fish_command_timer_get_ts)
-  set -l command_time (math "$command_end_time - $command_start_time")
-  set -l num_days (math "$command_time / $DAY")
-  set -l num_hours (math "$command_time % $DAY / $HOUR")
-  set -l num_mins (math "$command_time % $HOUR / $MIN")
-  set -l num_secs (math "$command_time % $MIN / $SEC")
-  set -l num_msecs (math "$command_time % $SEC / $MSEC")
+  set -l num_days (math "$CMD_DURATION / $DAY")
+  set -l num_hours (math "$CMD_DURATION % $DAY / $HOUR")
+  set -l num_mins (math "$CMD_DURATION % $HOUR / $MIN")
+  set -l num_secs (math "$CMD_DURATION % $MIN / $SEC")
+  set -l num_millis (math "$CMD_DURATION % $SEC")
   set -l time_str ""
   if [ $num_days -gt 0 ]
     set time_str {$time_str}{$num_days}"d "
@@ -203,14 +172,14 @@ function -e fish_postexec fish_command_timer_postexec
   if [ $num_mins -gt 0 ]
     set time_str {$time_str}{$num_mins}"m "
   end
-  set -l num_msecs_pretty ''
+  set -l num_millis_pretty ''
   if begin
       set -q fish_command_timer_millis; and \
       [ "$fish_command_timer_millis" -ne 0 ]
      end
-    set num_msecs_pretty (printf '%03d' $num_msecs)
+    set num_millis_pretty (printf '%03d' $num_millis)
   end
-  set time_str {$time_str}{$num_secs}s{$num_msecs_pretty}
+  set time_str {$time_str}{$num_secs}s{$num_millis_pretty}
   if begin
       set -q fish_command_timer_export_cmd_duration_str; and \
       [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
@@ -225,7 +194,7 @@ function -e fish_postexec fish_command_timer_postexec
     return
   end
 
-  set -l now_str (fish_command_timer_print_time (math "$command_end_time / $SEC"))
+  set -l now_str (fish_command_timer_print_time $command_end_time)
   set -l output_str
   if [ -n "$now_str" ]
     set output_str "[ $time_str | $now_str ]"
