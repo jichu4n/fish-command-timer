@@ -89,9 +89,9 @@ else if type gdate > /dev/null ^ /dev/null; and gdate +'%N' | grep -qv 'N'
   function fish_command_timer_print_time
     gdate --date="@$argv[1]" +"$fish_command_timer_time_format"
   end
-else if type perl > /dev/null ^ /dev/null; then
+else if type perl > /dev/null ^ /dev/null
   function fish_command_timer_get_ts
-    perl -MTime::HiRes -e 'printf(\"%d\",Time::HiRes::time()*1000000000)'
+    perl -MTime::HiRes -e 'printf("%d",Time::HiRes::time()*1000000000)'
   end
   function fish_command_timer_print_time
     date -r "$argv[1]" +"$fish_command_timer_time_format"
@@ -123,7 +123,9 @@ else
   set -e fish_command_timer_enabled
 end
 
-set fish_command_timer_start_time
+if not set -q fish_command_timer_start_time
+  set fish_command_timer_start_time
+end
 
 # The fish_preexec event is fired before executing a command line.
 function -e fish_preexec fish_command_timer_preexec
