@@ -15,6 +15,10 @@ Demo:
 
 ![Demo Screen-cap](https://github.com/jichuan89/bash-command-timer/raw/master/bash_command_timer_screenshot.gif)
 
+Additionally, the script will export the total execution time (as a human
+readable string, e.g., `42s027`) as `$CMD_DURATION_STR`. You can use this
+variable in your subsequent prompt.
+
 Requirements
 ------------
 
@@ -59,4 +63,7 @@ on-the-fly if you want the changes to only affect your current shell session.
   http://strftime.org/). If empty, the current time will not be printed.
 * `set fish_command_timer_millis`: Whether to print timings to millisecond
   precision. If set to `0`, will print timings up to seconds.
+* `set fish_command_timer_export_cmd_duration_str`: If set to `1`, will export
+  the total command execution time string to `$CMD_DURATION_STR`, for use in
+  prompts. If set to `0`, the `$CMD_DURATION_STR` variable will not be exported.
 
