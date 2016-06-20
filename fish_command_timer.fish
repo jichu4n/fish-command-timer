@@ -123,7 +123,9 @@ else
   set -e fish_command_timer_enabled
 end
 
-set fish_command_timer_start_time (fish_command_timer_get_ts)
+if not set -q fish_command_timer_start_time
+  set fish_command_timer_start_time
+end
 
 # The fish_preexec event is fired before executing a command line.
 function -e fish_preexec fish_command_timer_preexec
