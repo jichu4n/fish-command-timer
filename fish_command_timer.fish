@@ -75,6 +75,11 @@ end
 # called $CMD_DURATION_STR.
 if not set -q fish_command_timer_export_cmd_duration_str
   set fish_command_timer_export_cmd_duration_str 1
+end
+if begin
+     set -q fish_command_timer_export_cmd_duration_str; and \
+     [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
+   end
   set CMD_DURATION_STR
 end
 
@@ -140,16 +145,26 @@ else
   set fish_command_timer_enabled 0
 end
 
+# Computes whether the preexec and postexec hooks should compute command
+# duration.
+function fish_command_timer_compute
+  begin
+    set -q fish_command_timer_enabled; and \
+    [ "$fish_command_timer_enabled" -ne 0 ]
+  end; or \
+  begin
+    set -q fish_command_timer_export_cmd_duration_str; and \
+    [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
+  end
+end
+
 if not set -q fish_command_timer_start_time
   set fish_command_timer_start_time
 end
 
 # The fish_preexec event is fired before executing a command line.
 function -e fish_preexec fish_command_timer_preexec
-  if begin
-       not set -q fish_command_timer_enabled; or \
-       not [ "$fish_command_timer_enabled" -ne 0 ]
-     end
+  if not fish_command_timer_compute
     return
   end
   set fish_command_timer_start_time (fish_command_timer_get_ts)
@@ -158,12 +173,9 @@ end
 # The fish_postexec event is fired after executing a command line.
 function -e fish_postexec fish_command_timer_postexec
   if begin
-       not set -q fish_command_timer_enabled; or \
-       not [ "$fish_command_timer_enabled" -ne 0 ]
+       [ -z "$fish_command_timer_start_time" ]; or \
+       not fish_command_timer_compute
      end
-    return
-  end
-  if [ -z "$fish_command_timer_start_time" ]
     return
   end
 
@@ -204,6 +216,13 @@ function -e fish_postexec fish_command_timer_postexec
       [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
      end
     set CMD_DURATION_STR "$time_str"
+  end
+
+  if begin
+       not set -q fish_command_timer_enabled; or \
+       not [ "$fish_command_timer_enabled" -ne 0 ]
+     end
+    return
   end
 
   set -l now_str (fish_command_timer_print_time (math "$command_end_time / $SEC"))
