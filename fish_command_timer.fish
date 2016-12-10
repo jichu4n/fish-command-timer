@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
-#    Copyright (C) 2016 Chuan Ji <jichuan89@gmail.com>                        #
+#    Copyright (C) 2016 Chuan Ji <jichu4n@gmail.com>                          #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -20,7 +20,7 @@
 #
 # For the most up-to-date version, as well as further information and
 # installation instructions, please visit the GitHub project page at
-#     https://github.com/jichuan89/fish-command-timer
+#     https://github.com/jichu4n/fish-command-timer
 #
 # Requires fish 2.2 or above.
 

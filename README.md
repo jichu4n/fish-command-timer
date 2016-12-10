@@ -13,7 +13,7 @@ execution time is formatted to be human readable; e.g., `2h 7m 42s301`.
 
 Demo:
 
-![Demo Screen-cap](https://github.com/jichuan89/bash-command-timer/raw/master/bash_command_timer_screenshot.gif)
+![Demo Screen-cap](https://github.com/jichu4n/bash-command-timer/raw/master/bash_command_timer_screenshot.gif)
 
 Additionally, the script will export the total execution time (as a human
 readable string, e.g., `42s027`) as `$CMD_DURATION_STR`. You can use this
