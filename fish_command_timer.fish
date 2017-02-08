@@ -146,7 +146,7 @@ function fish_command_timer_compute
 end
 
 # The fish_postexec event is fired after executing a command line.
-function -e fish_postexec fish_command_timer_postexec
+function fish_command_timer_postexec -e fish_postexec
   if not fish_command_timer_compute
     return
   end
