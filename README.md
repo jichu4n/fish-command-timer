@@ -32,25 +32,16 @@ Installation
 
 To set up this extension, you can
 
-1. Download `fish_command_timer.fish` somewhere, and add the following to your
-   `~/.config/fish/config.fish` (replace with actual path where you saved the script):
-
-   ```bash
-   source ~/.fish_command_timer.fish
-   ```
-
-2. Alternatively, you can simply copy and paste the contents of
-   `fish_command_timer.fish` into your `~/.config/fish/config.fish`.
+1. Download `fish_command_timer.fish` and put it in `~/.config/fish/conf.d/` (as per [Fish shell convention](https://fishshell.com/docs/current/index.html#initialization)).
 
 That's it :)
 
 Settings
 --------
 
-You can use the following options to tweak the behavior of the script. You can
-either make the changes in-place (at the top of the script) or put them before
-or after sourcing the script in your `config.fish`. You can also modify them
-on-the-fly if you want the changes to only affect your current shell session.
+You can use the following options to tweak the behavior of the script. 
+Put them in your `config.fish`. 
+You can also modify them on-the-fly if you want the changes to only affect your current shell session.
 
 * `set fish_command_timer_enabled`: Setting this variable to `0` disables this
   script.
