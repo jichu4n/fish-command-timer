@@ -32,7 +32,11 @@ Installation
 
 To set up this extension, you can
 
-1. Download [`conf.d/fish_command_timer.fish`](https://github.com/jichu4n/fish-command-timer/blob/master/conf.d/fish_command_timer.fish) and put it in `~/.config/fish/conf.d/` (as per [Fish shell convention](https://fishshell.com/docs/current/index.html#initialization)).
+1. Download [`conf.d/fish_command_timer.fish`](https://github.com/jichu4n/fish-command-timer/blob/master/conf.d/fish_command_timer.fish) and put it in `~/.config/fish/conf.d/` as per [Fish shell convention](https://fishshell.com/docs/current/index.html#initialization).
+2. If the above doesn't work for you (perhaps because your custom settings overrides the extension), you could try sourcing it directly. Download [`conf.d/fish_command_timer.fish`](https://github.com/jichu4n/fish-command-timer/blob/master/conf.d/fish_command_timer.fish) and put it in `~/.config/fish/`, then add the following in your `~/.config/fish/config.fish` at the end:
+   ```
+   source ~/.config/fish/fish_command_timer.fish
+   ```
 
 That's it :)
 
