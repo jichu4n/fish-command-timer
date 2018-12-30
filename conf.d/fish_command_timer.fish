@@ -96,12 +96,12 @@ end
 # Command to print out a timestamp using fish_command_timer_time_format. The
 # timestamp should be in seconds. This is required because the "date" command in
 # Linux and OS X use different arguments to specify the timestamp to print.
-if date --date='@0' '+%s' > /dev/null ^ /dev/null
+if date --date='@0' '+%s' > /dev/null 2> /dev/null
   # Linux.
   function fish_command_timer_print_time
     date --date="@$argv[1]" +"$fish_command_timer_time_format"
   end
-else if date -r 0 '+%s' > /dev/null ^ /dev/null
+else if date -r 0 '+%s' > /dev/null 2> /dev/null
   # macOS / BSD.
   function fish_command_timer_print_time
     date -r "$argv[1]" +"$fish_command_timer_time_format"
@@ -116,15 +116,15 @@ end
 # Command to print out the length of a string. This is required because the expr
 # command behaves differently on Linux and OS X. On fish 2.3+, we will use the
 # "string" builtin.
-if type string > /dev/null ^ /dev/null
+if type string > /dev/null 2> /dev/null
   function fish_command_timer_strlen
     string length "$argv[1]"
   end
-else if expr length + "1" > /dev/null ^ /dev/null
+else if expr length + "1" > /dev/null 2> /dev/null
   function fish_command_timer_strlen
     expr length + "$argv[1]"
   end
-else if type wc > /dev/null ^ /dev/null; and type tr > /dev/null ^ /dev/null
+else if type wc > /dev/null 2> /dev/null; and type tr > /dev/null 2> /dev/null
   function fish_command_timer_strlen
     echo -n "$argv[1]" | wc -c | tr -d ' '
   end
