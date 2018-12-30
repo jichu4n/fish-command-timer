@@ -157,11 +157,11 @@ function fish_command_timer_postexec -e fish_postexec
   set -l HOUR 3600000
   set -l DAY 86400000
 
-  set -l num_days (math "$CMD_DURATION / $DAY")
-  set -l num_hours (math "$CMD_DURATION % $DAY / $HOUR")
-  set -l num_mins (math "$CMD_DURATION % $HOUR / $MIN")
-  set -l num_secs (math "$CMD_DURATION % $MIN / $SEC")
-  set -l num_millis (math "$CMD_DURATION % $SEC")
+  set -l num_days (math -s0 "$CMD_DURATION / $DAY")
+  set -l num_hours (math -s0 "$CMD_DURATION % $DAY / $HOUR")
+  set -l num_mins (math -s0 "$CMD_DURATION % $HOUR / $MIN")
+  set -l num_secs (math -s0 "$CMD_DURATION % $MIN / $SEC")
+  set -l num_millis (math -s0 "$CMD_DURATION % $SEC")
   set -l time_str ""
   if [ $num_days -gt 0 ]
     set time_str {$time_str}{$num_days}"d "
