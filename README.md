@@ -47,8 +47,7 @@ You can use the following options to tweak the behavior of the script.
 Put them in your `config.fish`. 
 You can also modify them on-the-fly if you want the changes to only affect your current shell session.
 
-* `set fish_command_timer_enabled`: Setting this variable to `0` disables this
-  script.
+* `set fish_command_timer_enabled`: Setting this variable to `0` disables printing of measured time.
 * `set fish_command_timer_color blue`: The color of the output. This should be a
   color string recognized by fish's set_color command, as described
   [here](http://fishshell.com/docs/current/commands.html#set_color). If not set,
@@ -62,3 +61,4 @@ You can also modify them on-the-fly if you want the changes to only affect your 
   the total command execution time string to `$CMD_DURATION_STR`, for use in
   prompts. If set to `0`, the `$CMD_DURATION_STR` variable will not be exported.
 
+Setting `fish_command_timer_enabled` to `0` and `fish_command_timer_export_cmd_duration_str` to `1` allows printing the time in the subsequent prompt without *also* having it printed after the command completes.
