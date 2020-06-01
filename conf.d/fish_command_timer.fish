@@ -219,7 +219,7 @@ function fish_command_timer_postexec -e fish_postexec
     set status_str "[ $signal ]"
   end
   
-  set -l status_colored
+  set -l status_str_colored
   set -l output_str_colored
   if begin
        set -q fish_command_timer_color; and \
@@ -227,13 +227,13 @@ function fish_command_timer_postexec -e fish_postexec
      end
     set output_str_colored (set_color $fish_command_timer_color)"$output_str"(set_color normal)
     if [ $last_status -ne 0 ]
-        set status_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
+        set status_str_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
     else
-        set status_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
+        set status_str_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
     end
   else
     set output_str_colored "$output_str"
-    set status_colored "$status_str"
+    set status_str_colored "$status_str"
   end
   set -l output_str_length (fish_command_timer_strlen "$output_str")
   set -l status_str_length (fish_command_timer_strlen "$status_str")
@@ -244,6 +244,6 @@ function fish_command_timer_postexec -e fish_postexec
   # Move back (length of output_str) columns.
   echo -ne "\033["{$str_length}"D"
   # Finally, print output.
-  echo -e "$status_colored $output_str_colored"
+  echo -e "$status_str_colored $output_str_colored"
 end
 
