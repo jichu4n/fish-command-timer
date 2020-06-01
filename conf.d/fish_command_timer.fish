@@ -147,6 +147,8 @@ end
 
 # The fish_postexec event is fired after executing a command line.
 function fish_command_timer_postexec -e fish_postexec
+  set -l last_status $pipestatus
+  
   if not fish_command_timer_compute
     return
   end
@@ -201,6 +203,16 @@ function fish_command_timer_postexec -e fish_postexec
   else
     set output_str "[ $time_str ]"
   end
+  # Status
+  set -l signal (__fish_status_to_signal $last_status)
+  set -l status_str "[ $signal ]"
+  set -l status_colored
+  if test $last_status -ne 0
+      set status_colored (set_color --bold $fish_color_status)"$status_str"(set_color normal)
+  else
+      set status_colored (set_color green)"$status_str"(set_color normal)
+  end
+  
   set -l output_str_colored
   if begin
        set -q fish_command_timer_color; and \
@@ -211,12 +223,14 @@ function fish_command_timer_postexec -e fish_postexec
     set output_str_colored "$output_str"
   end
   set -l output_str_length (fish_command_timer_strlen "$output_str")
+  set -l status_str_length (fish_command_timer_strlen "$status_str")
+  set -l str_length (math $output_str_length + $status_str_length)
 
   # Move to the end of the line. This will NOT wrap to the next line.
   echo -ne "\033["{$COLUMNS}"C"
   # Move back (length of output_str) columns.
-  echo -ne "\033["{$output_str_length}"D"
+  echo -ne "\033["{$str_length}"D"
   # Finally, print output.
-  echo -e "$output_str_colored"
+  echo -e "$status_colored $output_str_colored"
 end
 
