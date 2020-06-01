@@ -37,6 +37,9 @@
 if not set -q fish_command_timer_enabled
   set fish_command_timer_enabled 1
 end
+if not set -q fish_command_timer_status_enabled
+  set fish_command_timer_status_enabled 1
+end
 
 # The color of the output.
 #
@@ -211,8 +214,11 @@ function fish_command_timer_postexec -e fish_postexec
   end
   # Status
   set -l signal (__fish_status_to_signal $last_status)
-  set -l status_str "[ $signal ]"
-
+  set -l status_str
+  if [ "$fish_command_timer_status_enabled" -ne 0 ]
+    set status_str "[ $signal ]"
+  end
+  
   set -l status_colored
   set -l output_str_colored
   if begin
