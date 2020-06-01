@@ -50,6 +50,12 @@ end
 if not set -q fish_command_timer_color
   set fish_command_timer_color blue
 end
+if not set -q fish_command_timer_fail_color
+  set fish_command_timer_fail_color $fish_color_status
+end
+if not set -q fish_command_timer_success_color
+  set fish_command_timer_success_color green
+end
 
 # The display format of the current time.
 #
@@ -206,21 +212,22 @@ function fish_command_timer_postexec -e fish_postexec
   # Status
   set -l signal (__fish_status_to_signal $last_status)
   set -l status_str "[ $signal ]"
+
   set -l status_colored
-  if test $last_status -ne 0
-      set status_colored (set_color --bold $fish_color_status)"$status_str"(set_color normal)
-  else
-      set status_colored (set_color green)"$status_str"(set_color normal)
-  end
-  
   set -l output_str_colored
   if begin
        set -q fish_command_timer_color; and \
        [ -n "$fish_command_timer_color" ]
      end
     set output_str_colored (set_color $fish_command_timer_color)"$output_str"(set_color normal)
+    if [ $last_status -ne 0 ]
+        set status_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
+    else
+        set status_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
+    end
   else
     set output_str_colored "$output_str"
+    set status_colored "$status_str"
   end
   set -l output_str_length (fish_command_timer_strlen "$output_str")
   set -l status_str_length (fish_command_timer_strlen "$status_str")
