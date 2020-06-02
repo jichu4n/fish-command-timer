@@ -37,6 +37,9 @@
 if not set -q fish_command_timer_enabled
   set fish_command_timer_enabled 1
 end
+if not set -q fish_command_timer_status_enabled
+  set fish_command_timer_status_enabled 1
+end
 
 # The color of the output.
 #
@@ -49,6 +52,12 @@ end
 # support colors.
 if not set -q fish_command_timer_color
   set fish_command_timer_color blue
+end
+if not set -q fish_command_timer_fail_color
+  set fish_command_timer_fail_color $fish_color_status
+end
+if not set -q fish_command_timer_success_color
+  set fish_command_timer_success_color green
 end
 
 # The display format of the current time.
@@ -147,6 +156,8 @@ end
 
 # The fish_postexec event is fired after executing a command line.
 function fish_command_timer_postexec -e fish_postexec
+  set -l last_status $pipestatus
+  
   if not fish_command_timer_compute
     return
   end
@@ -201,22 +212,38 @@ function fish_command_timer_postexec -e fish_postexec
   else
     set output_str "[ $time_str ]"
   end
+  # Status
+  set -l signal (__fish_status_to_signal $last_status)
+  set -l status_str
+  if [ "$fish_command_timer_status_enabled" -ne 0 ]
+    set status_str "[ $signal ]"
+  end
+  
+  set -l status_str_colored
   set -l output_str_colored
   if begin
        set -q fish_command_timer_color; and \
        [ -n "$fish_command_timer_color" ]
      end
     set output_str_colored (set_color $fish_command_timer_color)"$output_str"(set_color normal)
+    if [ $last_status -ne 0 ]
+        set status_str_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
+    else
+        set status_str_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
+    end
   else
     set output_str_colored "$output_str"
+    set status_str_colored "$status_str"
   end
   set -l output_str_length (fish_command_timer_strlen "$output_str")
+  set -l status_str_length (fish_command_timer_strlen "$status_str")
+  set -l str_length (math $output_str_length + $status_str_length)
 
   # Move to the end of the line. This will NOT wrap to the next line.
   echo -ne "\033["{$COLUMNS}"C"
   # Move back (length of output_str) columns.
-  echo -ne "\033["{$output_str_length}"D"
+  echo -ne "\033["{$str_length}"D"
   # Finally, print output.
-  echo -e "$output_str_colored"
+  echo -e "$status_str_colored $output_str_colored"
 end
 
