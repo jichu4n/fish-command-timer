@@ -47,11 +47,18 @@ You can use the following options to tweak the behavior of the script.
 Put them in your `config.fish`. 
 You can also modify them on-the-fly if you want the changes to only affect your current shell session.
 
-* `set fish_command_timer_enabled`: Setting this variable to `0` disables printing of measured time.
+* `set fish_command_timer_enabled`: Setting this variable to `0` disables
+  printing of measured time.
+* `set fish_command_timer_status_enabled`: Setting this variable to `0`
+  disables printing of the last command's exit status.
 * `set fish_command_timer_color blue`: The color of the output. This should be a
-  color string recognized by fish's set_color command, as described
+  color string recognized by fish's `set_color` command, as described
   [here](http://fishshell.com/docs/current/commands.html#set_color). If not set,
   the output will be in the default color.
+* `set fish_command_timer_success_color green`: The color of the last command's exit
+  status if it was successful (i.e. `0`).
+* `set fish_command_timer_fail_color red`: The color of the last command's exit
+  status if it was not successful.
 * `set fish_command_timer_time_format '%b %d %I:%M%p'`: The display format of
   the current time.  This is a strftime format string (see
   http://strftime.org/). If empty, the current time will not be printed.
