@@ -264,7 +264,7 @@ function fish_command_timer_postexec -e fish_postexec
   end
 
   # Combine status string and timing string.
-  set -l output_length (math $timing_str_length + $status_str_length)
+  set -l output_length (math $timing_str_length + $status_str_length + 1)
 
   # Move to the end of the line. This will NOT wrap to the next line.
   echo -ne "\033["{$COLUMNS}"C"
