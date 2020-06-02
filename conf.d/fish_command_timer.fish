@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
-#    Copyright (C) 2016 Chuan Ji <jichu4n@gmail.com>                          #
+#    Copyright (C) 2016-2020 Chuan Ji <chuan@jichu4n.com>                     #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -29,7 +29,7 @@
 #
 # Whether to enable the command timer by default.
 #
-# To temporarily disable the printing of timing information, type the following
+# To temporarily disable the command timer, type the following
 # in a session:
 #     set fish_command_timer_enabled 0
 # To re-enable:
@@ -37,6 +37,7 @@
 if not set -q fish_command_timer_enabled
   set fish_command_timer_enabled 1
 end
+# Whether to display the exit status of the previous command line.
 if not set -q fish_command_timer_status_enabled
   set fish_command_timer_status_enabled 1
 end
@@ -53,11 +54,12 @@ end
 if not set -q fish_command_timer_color
   set fish_command_timer_color blue
 end
-if not set -q fish_command_timer_fail_color
-  set fish_command_timer_fail_color $fish_color_status
-end
+# Similarly, the color to use for displaying success and failure exit statuses.
 if not set -q fish_command_timer_success_color
   set fish_command_timer_success_color green
+end
+if not set -q fish_command_timer_fail_color
+  set fish_command_timer_fail_color $fish_color_status
 end
 
 # The display format of the current time.
@@ -143,7 +145,7 @@ else
 end
 
 # Computes whether the postexec hooks should compute command duration.
-function fish_command_timer_compute
+function fish_command_timer_should_compute
   begin
     set -q fish_command_timer_enabled; and \
     [ "$fish_command_timer_enabled" -ne 0 ]
@@ -154,15 +156,8 @@ function fish_command_timer_compute
   end
 end
 
-# The fish_postexec event is fired after executing a command line.
-function fish_command_timer_postexec -e fish_postexec
-  set -l last_status $pipestatus
-  
-  if not fish_command_timer_compute
-    return
-  end
-  set -l command_end_time (date '+%s')
-
+# Computes the command duration string (e.g. "3m5s016").
+function fish_command_timer_compute_cmd_duration_str
   set -l SEC 1000
   set -l MIN 60000
   set -l HOUR 3600000
@@ -173,15 +168,15 @@ function fish_command_timer_postexec -e fish_postexec
   set -l num_mins (math -s0 "$CMD_DURATION % $HOUR / $MIN")
   set -l num_secs (math -s0 "$CMD_DURATION % $MIN / $SEC")
   set -l num_millis (math -s0 "$CMD_DURATION % $SEC")
-  set -l time_str ""
+  set -l cmd_duration_str ""
   if [ $num_days -gt 0 ]
-    set time_str {$time_str}{$num_days}"d "
+    set cmd_duration_str {$cmd_duration_str}{$num_days}"d "
   end
   if [ $num_hours -gt 0 ]
-    set time_str {$time_str}{$num_hours}"h "
+    set cmd_duration_str {$cmd_duration_str}{$num_hours}"h "
   end
   if [ $num_mins -gt 0 ]
-    set time_str {$time_str}{$num_mins}"m "
+    set cmd_duration_str {$cmd_duration_str}{$num_mins}"m "
   end
   set -l num_millis_pretty ''
   if begin
@@ -190,60 +185,92 @@ function fish_command_timer_postexec -e fish_postexec
      end
     set num_millis_pretty (printf '%03d' $num_millis)
   end
-  set time_str {$time_str}{$num_secs}s{$num_millis_pretty}
+  set cmd_duration_str {$cmd_duration_str}{$num_secs}s{$num_millis_pretty}
+  echo $cmd_duration_str
+end
+
+# The fish_postexec event is fired after executing a command line.
+function fish_command_timer_postexec -e fish_postexec
+  set -l last_status $status
+  set -l command_end_time (date '+%s')
+
+  if not fish_command_timer_should_compute
+    return
+  end
+
+  set -l cmd_duration_str (fish_command_timer_compute_cmd_duration_str)
   if begin
       set -q fish_command_timer_export_cmd_duration_str; and \
       [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
      end
-    set CMD_DURATION_STR "$time_str"
+    set CMD_DURATION_STR "$cmd_duration_str"
   end
 
-  if begin
-       not set -q fish_command_timer_enabled; or \
-       not [ "$fish_command_timer_enabled" -ne 0 ]
-     end
+  if not begin
+      set -q fish_command_timer_enabled; and \
+      [ "$fish_command_timer_enabled" -ne 0 ]
+      end
     return
   end
 
+  # Compute timing string (e.g. [ 1s016 | Oct 01 11:11PM ])
+  set -l timing_str
   set -l now_str (fish_command_timer_print_time $command_end_time)
-  set -l output_str
   if [ -n "$now_str" ]
-    set output_str "[ $time_str | $now_str ]"
+    set timing_str "[ $cmd_duration_str | $now_str ]"
   else
-    set output_str "[ $time_str ]"
+    set timing_str "[ $cmd_duration_str ]"
   end
-  # Status
-  set -l signal (__fish_status_to_signal $last_status)
-  set -l status_str
-  if [ "$fish_command_timer_status_enabled" -ne 0 ]
-    set status_str "[ $signal ]"
-  end
-  
-  set -l status_str_colored
-  set -l output_str_colored
+  set -l timing_str_length (fish_command_timer_strlen "$timing_str")
+
+  # Compute timing string with color.
+  set -l timing_str_colored
   if begin
        set -q fish_command_timer_color; and \
        [ -n "$fish_command_timer_color" ]
      end
-    set output_str_colored (set_color $fish_command_timer_color)"$output_str"(set_color normal)
-    if [ $last_status -ne 0 ]
-        set status_str_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
-    else
-        set status_str_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
-    end
+    set timing_str_colored (set_color $fish_command_timer_color)"$timing_str"(set_color normal)
   else
-    set output_str_colored "$output_str"
+    set timing_str_colored "$timing_str"
+  end
+
+  # Compute status string (e.g. [ SIGINT ])
+  set -l status_str ""
+  if begin
+      set -q fish_command_timer_status_enabled; and \
+      [ "$fish_command_timer_status_enabled" -ne 0 ]
+     end
+    set -l signal (__fish_status_to_signal $last_status)
+    set status_str "[ $signal ]"
+  end
+  set -l status_str_length (fish_command_timer_strlen "$status_str")
+
+  # Compute status string with color.
+  set -l status_str_colored
+  if begin
+      [ $last_status -eq 0 ]; and \
+      set -q fish_command_timer_success_color; and \
+      [ -n "$fish_command_timer_success_color" ]
+      end
+    set status_str_colored (set_color $fish_command_timer_success_color)"$status_str"(set_color normal)
+  else if begin
+      [ $last_status -ne 0 ]; and \
+      set -q fish_command_timer_fail_color; and \
+      [ -n "$fish_command_timer_fail_color" ]
+      end
+    set status_str_colored (set_color --bold $fish_command_timer_fail_color)"$status_str"(set_color normal)
+  else
     set status_str_colored "$status_str"
   end
-  set -l output_str_length (fish_command_timer_strlen "$output_str")
-  set -l status_str_length (fish_command_timer_strlen "$status_str")
-  set -l str_length (math $output_str_length + $status_str_length)
+
+  # Combine status string and timing string.
+  set -l output_length (math $timing_str_length + $status_str_length + 1)
 
   # Move to the end of the line. This will NOT wrap to the next line.
   echo -ne "\033["{$COLUMNS}"C"
-  # Move back (length of output_str) columns.
-  echo -ne "\033["{$str_length}"D"
+  # Move back output_length columns.
+  echo -ne "\033["{$output_length}"D"
   # Finally, print output.
-  echo -e "$status_str_colored $output_str_colored"
+  echo -e "$status_str_colored $timing_str_colored"
 end
 
