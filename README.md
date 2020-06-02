@@ -51,10 +51,10 @@ You can also modify them on-the-fly if you want the changes to only affect your 
   printing of measured time.
 * `set fish_command_timer_status_enabled`: Setting this variable to `0`
   disables printing of the last command's exit status.
-* `set fish_command_timer_color blue`: The color of the output. This should be a
-  color string recognized by fish's `set_color` command, as described
-  [here](http://fishshell.com/docs/current/commands.html#set_color). If not set,
-  the output will be in the default color.
+* `set fish_command_timer_color blue`: The color to use for timing information.
+  This should be a color string recognized by fish's `set_color` command, as
+  described [here](http://fishshell.com/docs/current/commands.html#set_color).
+  If not set, the timing information will be in the default color.
 * `set fish_command_timer_success_color green`: The color of the last command's exit
   status if it was successful (i.e. `0`).
 * `set fish_command_timer_fail_color red`: The color of the last command's exit
@@ -68,4 +68,7 @@ You can also modify them on-the-fly if you want the changes to only affect your 
   the total command execution time string to `$CMD_DURATION_STR`, for use in
   prompts. If set to `0`, the `$CMD_DURATION_STR` variable will not be exported.
 
-Setting `fish_command_timer_enabled` to `0` and `fish_command_timer_export_cmd_duration_str` to `1` allows printing the time in the subsequent prompt without *also* having it printed after the command completes.
+Setting `fish_command_timer_enabled` to `0` and
+`fish_command_timer_export_cmd_duration_str` to `1` allows printing the time in
+the subsequent prompt without *also* having it printed after the command
+completes.

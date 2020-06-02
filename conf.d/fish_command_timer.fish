@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
-#    Copyright (C) 2016 Chuan Ji <jichu4n@gmail.com>                          #
+#    Copyright (C) 2016-2020 Chuan Ji <chuan@jichu4n.com>                     #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -145,7 +145,7 @@ else
 end
 
 # Computes whether the postexec hooks should compute command duration.
-function fish_command_timer_compute
+function fish_command_timer_should_compute
   begin
     set -q fish_command_timer_enabled; and \
     [ "$fish_command_timer_enabled" -ne 0 ]
@@ -192,11 +192,11 @@ end
 # The fish_postexec event is fired after executing a command line.
 function fish_command_timer_postexec -e fish_postexec
   set -l last_status $status
+  set -l command_end_time (date '+%s')
 
-  if not fish_command_timer_compute
+  if not fish_command_timer_should_compute
     return
   end
-  set -l command_end_time (date '+%s')
 
   set -l cmd_duration_str (fish_command_timer_compute_cmd_duration_str)
   if begin
@@ -204,6 +204,13 @@ function fish_command_timer_postexec -e fish_postexec
       [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
      end
     set CMD_DURATION_STR "$cmd_duration_str"
+  end
+
+  if not begin
+      set -q fish_command_timer_enabled; and \
+      [ "$fish_command_timer_enabled" -ne 0 ]
+      end
+    return
   end
 
   # Compute timing string (e.g. [ 1s016 | Oct 01 11:11PM ])
