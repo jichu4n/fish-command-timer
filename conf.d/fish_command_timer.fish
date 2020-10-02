@@ -37,9 +37,9 @@
 if not set -q fish_command_timer_enabled
   set fish_command_timer_enabled 1
 end
-# Whether to display the exit status of the previous command line.
+# Whether to display the exit status of the previous command.
 if not set -q fish_command_timer_status_enabled
-  set fish_command_timer_status_enabled 1
+  set fish_command_timer_status_enabled 0
 end
 
 # The color of the output.
@@ -92,6 +92,15 @@ if begin
      [ "$fish_command_timer_export_cmd_duration_str" -ne 0 ]
    end
   set CMD_DURATION_STR
+end
+
+# The minimum command duration that should trigger printing of command timings,
+# in milliseconds.
+#
+# When set to a non-zero value, commands that finished within the specified
+# number of milliseconds will not trigger printing of command timings.
+if not set -q fish_command_timer_min_cmd_duration
+  set fish_command_timer_min_cmd_duration 0
 end
 
 
@@ -212,6 +221,15 @@ function fish_command_timer_postexec -e fish_postexec
       end
     return
   end
+  if set -q fish_command_timer_min_cmd_duration; and \
+      [ "$fish_command_timer_min_cmd_duration" -gt "$CMD_DURATION" ]; and begin
+        [ "$last_status" -eq 0 ]; or \
+        not set -q fish_command_timer_status_enabled; or \
+        [ "$fish_command_timer_status_enabled" -eq 0 ]
+      end
+    return
+  end
+
 
   # Compute timing string (e.g. [ 1s016 | Oct 01 11:11PM ])
   set -l timing_str
