@@ -48,7 +48,7 @@ Put them in your `config.fish`.
 You can also modify them on-the-fly if you want the changes to only affect your current shell session.
 
 * `set fish_command_timer_enabled`: Setting this variable to `0` disables
-  printing of timing and exit status information.
+  printing of all timing and exit status information.
 * `set fish_command_timer_status_enabled`: Setting this variable to `0`
   disables printing of exit status information.
 * `set fish_command_timer_color blue`: The color to use for timing information.
@@ -67,4 +67,12 @@ You can also modify them on-the-fly if you want the changes to only affect your 
 * `set fish_command_timer_export_cmd_duration_str`: If set to `1`, will export
   the total command execution time string to `$CMD_DURATION_STR`, for use in
   prompts. If set to `0`, the `$CMD_DURATION_STR` variable will not be exported.
+* `set fish_command_timer_min_cmd_duration`: The minimum command duration (in
+  milliseconds) that should trigger printing of command timing information.
+  Commands that complete within the specified number of milliseconds will not
+  trigger printing of command timing information.
+  - Note that when `fish_command_timer_status_enabled` is set, commands that
+    exit with a non-zero status will always trigger printing of command timing
+    and exit status information even if they complete within
+    `$fish_command_timer_min_cmd_duration`.
 
