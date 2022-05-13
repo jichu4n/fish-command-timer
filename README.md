@@ -9,14 +9,13 @@ Usage
 
 After the execution of each command line, the script prints out the total
 execution time (up to millisecond precision), followed by the current time. The
-execution time is formatted to be human readable; e.g., `2h 7m 42s301`.
+execution time is formatted to be human-readable; e.g., `2h 7m 42s301`.
 
 Demo:
 
 ![Demo Screen-cap](https://github.com/jichu4n/bash-command-timer/raw/master/bash_command_timer_screenshot.gif)
 
-Additionally, the script will export the total execution time (as a human
-readable string, e.g., `42s027`) as `$CMD_DURATION_STR`. You can use this
+Additionally, the script will export the total execution time (as a human-readable string, e.g., `42s027`) as `$CMD_DURATION_STR`. You can use this
 variable in your subsequent prompt.
 
 Requirements
@@ -24,8 +23,7 @@ Requirements
 
 This script requires fish shell 2.2 or above. It should run pretty much out of
 the box on modern Linux and Mac OS X systems. Please report any
-incompatibilities on
-[on GitHub](https://github.com/jichu4n/fish-command-timer/issues).
+incompatibilities [on GitHub](https://github.com/jichu4n/fish-command-timer/issues).
 
 Installation
 ------------
