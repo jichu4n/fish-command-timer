@@ -54,7 +54,7 @@ You can also modify them on-the-fly if you want the changes to only affect your 
   described [here](http://fishshell.com/docs/current/commands.html#set_color).
   If not set, the timing information will be in the default color.
 * `set fish_command_timer_success_color green`: The color of the last command's exit
-  status if it was successful (i.e. `0`).
+  status if it was successful (i.e., `0`).
 * `set fish_command_timer_fail_color red`: The color of the last command's exit
   status if it was not successful.
 * `set fish_command_timer_time_format '%b %d %I:%M%p'`: The display format of
