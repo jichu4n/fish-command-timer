@@ -258,7 +258,7 @@ function fish_command_timer_postexec -e fish_postexec
       set -q fish_command_timer_status_enabled; and \
       [ "$fish_command_timer_status_enabled" -ne 0 ]
      end
-    set -l signal (__fish_status_to_signal $last_status)
+    set -l signal (fish_status_to_signal $last_status)
     set status_str "[ $signal ]"
   end
   set -l status_str_length (fish_command_timer_strlen "$status_str")
