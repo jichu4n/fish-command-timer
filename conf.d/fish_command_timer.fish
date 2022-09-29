@@ -42,6 +42,10 @@ if not set -q fish_command_timer_status_enabled
   set fish_command_timer_status_enabled 0
 end
 
+if not set -q fish_command_timer_export_only_string
+  set fish_command_timer_export_only_string 0
+end
+
 # The color of the output.
 #
 # This should be a color string accepted by fish's set_color command, as
@@ -281,9 +285,11 @@ function fish_command_timer_postexec -e fish_postexec
     set status_str_colored "$status_str"
   end
 
-  if fish_command_timer_only_string 
+  if [ $fish_command_timer_export_only_string -ne 0 ] 
     set -g fish_command_timer_string "$status_str_colored $timing_str_colored"
+    return
   end
+
   # Combine status string and timing string.
   set -l output_length (math $timing_str_length + $status_str_length + 1)
 
